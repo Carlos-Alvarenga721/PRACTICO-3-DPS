@@ -4,7 +4,6 @@ import useStore from '../useStore';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
-
 // Resource component
 function Recurso(props) {
   return (
@@ -19,41 +18,56 @@ function Recurso(props) {
         <Text style={styles.listText}>{props.description}</Text>
       </View>
       <View style={styles.column}>
-      <Text style={styles.listText}>{props.type}</Text>
+        <Text style={styles.listText}>{props.type}</Text>
       </View>
     </View>
   );
 }
 
-
 const App = () => {
-  
   const setResources = useStore((state) => state.setResources);
+  const data = useStore((state) => state.resources);
+  const [searchId, setSearchId] = useState('');
+  const [searchedResource, setSearchedResource] = useState(null);
 
   // Data set function
-  function dataGetter() {
-
-    axios.get('https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos')
-    .then(function (response) {
-      console.log(response.data);
+  const dataGetter = async () => {
+    try {
+      const response = await axios.get('https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos');
       setResources(response.data);
-    })
-  }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // Call the dataGetter function only once
+  // Fetch all resources on mount
   useEffect(() => {
     dataGetter();
-  }
-  , []);
-  
+  }, []);
 
-  const data = useStore((state) => state.resources);
-  if(data.length === 0) {
+  // Function to search for a resource by ID
+  const searchResourceById = async () => {
+    try {
+      const response = await axios.get(`https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos/${searchId}`);
+      setSearchedResource(response.data);
+    } catch (error) {
+      console.error(error);
+      setSearchedResource(null); // Clear searched resource on error
+    }
+  };
+
+  // Function to show the list of resources
+  const showResourceList = () => {
+    setSearchedResource(null); // Clear searched resource to show the list
+    setSearchId(''); // Clear the search ID input
+  };
+
+  if (data.length === 0) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
       </View>
-    )
+    );
   }
 
   return (
@@ -61,20 +75,42 @@ const App = () => {
       <StatusBar style="auto" />
       <Text style={styles.title}>Recursos</Text>
       <View style={styles.searchbox}>
-        <TextInput placeholder="Buscar" style={styles.input}/>
-        <Button title="Buscar" style={styles.button}/>
+        <TextInput
+          placeholder="Buscar por ID"
+          style={styles.input}
+          value={searchId}
+          onChangeText={setSearchId} // Update searchId state on input change
+        />
+        <Button title="Buscar" onPress={searchResourceById} />
       </View>
-      <FlatList
-        style={styles.list}
-        data={data}
-        renderItem={({ item }) => (
-          <Recurso id={item.id} title={item.titulo} description={item.descripcion} type={item.tipo} enlace={item.enlace} imagen={item.imagen}/>
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {searchedResource ? (
+        <>
+          <Recurso
+            id={searchedResource.id}
+            title={searchedResource.titulo}
+            description={searchedResource.descripcion}
+            type={searchedResource.tipo}
+          />
+          <Button title="Mostrar lista de recursos" onPress={showResourceList} />
+        </>
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={data.slice(0, 10)} // Show only the first 10 resources
+          renderItem={({ item }) => (
+            <Recurso
+              id={item.id}
+              title={item.titulo}
+              description={item.descripcion}
+              type={item.tipo}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
     </SafeAreaView>
   );
-}
+};
 
 export default App;
 
@@ -99,11 +135,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 5,
-  },
-  button: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#ccc',
   },
   list: {
     flex: 1,
@@ -132,5 +163,5 @@ const styles = StyleSheet.create({
   listTextId: {
     fontSize: 12,
     textAlign: 'right',
-  }
+  },
 });
