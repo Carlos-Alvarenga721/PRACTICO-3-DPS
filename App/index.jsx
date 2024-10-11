@@ -1,8 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList } from 'react-native';
-import useStore from '../useStore';
+import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList, Pressable } from 'react-native';
+import useStore from '../components/useStore';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native'; // Importar useFocusEffect
+
 
 // Resource component
 function Recurso(props) {
@@ -30,30 +33,39 @@ const App = () => {
   const [searchId, setSearchId] = useState('');
   const [searchedResource, setSearchedResource] = useState(null);
 
+
   // Data set function
   const dataGetter = async () => {
     try {
       const response = await axios.get('https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos');
       setResources(response.data);
+      console.log("API siendo llamada !!!!!!!!!!!!!!!!");
     } catch (error) {
       console.error(error);
     }
   };
 
   // Fetch all resources on mount
-  useEffect(() => {
-    dataGetter();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      dataGetter();
+    }, [])
+  )
 
   // Function to search for a resource by ID
   const searchResourceById = async () => {
     try {
-      const response = await axios.get(`https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos/${searchId}`);
-      setSearchedResource(response.data);
+      const resourceWithId = data.find((resource) => resource.id === searchId);
+      setSearchedResource(resourceWithId);
     } catch (error) {
       console.error(error);
       setSearchedResource(null); // Clear searched resource on error
     }
+  };
+
+  // Function to navigate to the add resource screen
+  const goToAddResource = () => {
+    router.navigate('/addResource');
   };
 
   // Function to show the list of resources
@@ -68,6 +80,10 @@ const App = () => {
         <Text>Loading...</Text>
       </View>
     );
+  }
+
+  if (data.length > useStore.getState().resources.length) {
+    data = useStore.getState().resources;
   }
 
   return (
@@ -96,7 +112,7 @@ const App = () => {
       ) : (
         <FlatList
           style={styles.list}
-          data={data.slice(0, 10)} // Show only the first 10 resources
+          data={data.slice()}
           renderItem={({ item }) => (
             <Recurso
               id={item.id}
@@ -106,8 +122,12 @@ const App = () => {
             />
           )}
           keyExtractor={(item) => item.id}
+          extraData={data}
         />
       )}
+      <Pressable style={styles.btnAdd} onPress={goToAddResource}>
+        <Text style={styles.textAdd}>Agregar</Text>
+      </Pressable>
     </SafeAreaView>
   );
 };
@@ -163,5 +183,15 @@ const styles = StyleSheet.create({
   listTextId: {
     fontSize: 12,
     textAlign: 'right',
+  },
+  btnAdd: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  textAdd: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
