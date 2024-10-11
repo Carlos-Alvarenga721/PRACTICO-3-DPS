@@ -1,18 +1,61 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList } from 'react-native';
+import useStore from '../useStore';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
+
+// Resource component
 function Recurso(props) {
   return (
     <View style={styles.row}>
-      <Text style={styles.listText}>{props.id}</Text>
-      <Text style={styles.listText}>{props.title}</Text>
-      <Text style={styles.listText}>{props.description}</Text>
+      <View style={styles.columnId}>
+        <Text style={styles.listTextId}>{props.id}</Text>
+      </View>
+      <View style={styles.column}>
+        <Text style={styles.listText}>{props.title}</Text>
+      </View>
+      <View style={styles.column}>
+        <Text style={styles.listText}>{props.description}</Text>
+      </View>
+      <View style={styles.column}>
       <Text style={styles.listText}>{props.type}</Text>
+      </View>
     </View>
   );
 }
 
-export default function App() {
+
+const App = () => {
+  
+  const setResources = useStore((state) => state.setResources);
+
+  // Data set function
+  function dataGetter() {
+
+    axios.get('https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos')
+    .then(function (response) {
+      console.log(response.data);
+      setResources(response.data);
+    })
+  }
+
+  // Call the dataGetter function only once
+  useEffect(() => {
+    dataGetter();
+  }
+  , []);
+  
+
+  const data = useStore((state) => state.resources);
+  if(data.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
@@ -21,14 +64,19 @@ export default function App() {
         <TextInput placeholder="Buscar" style={styles.input}/>
         <Button title="Buscar" style={styles.button}/>
       </View>
-      <View style={styles.list}>
-        <Recurso id="1" title="Recurso 1" description="Descripción del recurso 1" type="Tipo 1" enlace="Enlace del recurso 1" imagen="Imagen del recurso 1"/>
-        <Recurso id="2" title="Recurso 2" description="Descripción del recurso 2" type="Tipo 2" enlace="Enlace del recurso 2" imagen="Imagen del recurso 2"/>
-        <Recurso id="3" title="Recurso 3" description="Descripción del recurso 3" type="Tipo 3" enlace="Enlace del recurso 3" imagen="Imagen del recurso 3"/>
-      </View>
+      <FlatList
+        style={styles.list}
+        data={data}
+        renderItem={({ item }) => (
+          <Recurso id={item.id} title={item.titulo} description={item.descripcion} type={item.tipo} enlace={item.enlace} imagen={item.imagen}/>
+        )}
+        keyExtractor={(item) => item.id}
+      />
     </SafeAreaView>
   );
 }
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {
@@ -66,9 +114,23 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+  },
+  column: {
+    width: '25%',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  columnId: {
+    width: '5%',
+    marginLeft: 10,
+    marginRight: 10,
   },
   listText: {
     fontSize: 12,
   },
+  listTextId: {
+    fontSize: 12,
+    textAlign: 'right',
+  }
 });
