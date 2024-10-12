@@ -129,12 +129,14 @@ const App = () => {
           extraData={data}
         />
       )}
-      <Pressable style={styles.btnAdd} onPress={goToAddResource}>
-        <Text style={styles.textAdd}>Agregar</Text>
-      </Pressable>
-      <Pressable style={styles.btnAdd} onPress={goToEditResource}>
-        <Text style={styles.textAdd}>Editar</Text>
-      </Pressable>
+      <View style={styles.btnRow}>
+        <Pressable style={styles.btnAdd} onPress={goToAddResource}>
+          <Text style={styles.textAdd}>Agregar</Text>
+        </Pressable>
+        <Pressable style={styles.btnAdd} onPress={goToEditResource}>
+          <Text style={styles.textAdd}>Editar</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 };
@@ -191,11 +193,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'right',
   },
+  btnRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 20,
+  },
   btnAdd: {
     backgroundColor: 'green',
     padding: 10,
     borderRadius: 5,
-    marginTop: 20,
+    marginHorizontal: 10,
   },
   textAdd: {
     color: 'white',
