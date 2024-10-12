@@ -68,6 +68,10 @@ const App = () => {
     router.navigate('/addResource');
   };
 
+  const goToEditResource = () => {
+    router.navigate('/editResource');
+  };
+
   // Function to show the list of resources
   const showResourceList = () => {
     setSearchedResource(null); // Clear searched resource to show the list
@@ -127,6 +131,9 @@ const App = () => {
       )}
       <Pressable style={styles.btnAdd} onPress={goToAddResource}>
         <Text style={styles.textAdd}>Agregar</Text>
+      </Pressable>
+      <Pressable style={styles.btnAdd} onPress={goToEditResource}>
+        <Text style={styles.textAdd}>Editar</Text>
       </Pressable>
     </SafeAreaView>
   );
