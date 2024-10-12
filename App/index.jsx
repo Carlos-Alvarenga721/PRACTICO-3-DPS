@@ -12,7 +12,7 @@ function Recurso(props) {
   return (
     <View style={styles.row}>
       <View style={styles.columnId}>
-        <Text style={styles.listTextId}>{props.id}</Text>
+        <Text style={styles.listTextId}>{props.index + 1}</Text>
       </View>
       <View style={styles.column}>
         <Text style={styles.listText}>{props.title}</Text>
@@ -35,7 +35,6 @@ function RecursoModal(props) {
         <Text style={styles.titleModal}>Titulo: {props.title}</Text>
         <Text style={styles.textModal}>Descripcion: {props.description}</Text>
         <Text style={styles.textModal}>Tipo: {props.type}</Text>
-        <Text style={styles.textModal}>{props.id}</Text>
       </View>
     </>
   );
@@ -70,7 +69,7 @@ const App = () => {
   // Function to search for a resource by ID
   const searchResourceById = async () => {
     try {
-      const resourceWithId = data.find((resource) => resource.id === searchId);
+      const resourceWithId = data[searchId - 1]; // Get resource by ID
       setSearchedResource(resourceWithId);
     } catch (error) {
       console.error(error);
@@ -93,12 +92,26 @@ const App = () => {
     setSearchId(''); // Clear the search ID input
   };
 
+  const deleteResource = async (id) => {
+    try {
+      await axios.delete(`https://670801878e86a8d9e42dc45a.mockapi.io/api/recursos/${id}`);
+      dataGetter(); // Fetch data again to update the list
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleCloseModal = () => {
     showResourceList();
   };
 
   const handleEditModal = () => {
     goToEditResource();
+  };
+
+  const handleDeleteModal = () => {
+    deleteResource(searchedResource.id);
+    handleCloseModal();
   };
 
   if (data.length === 0) {
@@ -129,12 +142,13 @@ const App = () => {
         <FlatList
           style={styles.list}
           data={data.slice()}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <Recurso
               id={item.id}
               title={item.titulo}
               description={item.descripcion}
               type={item.tipo}
+              index={index}
             />
           )}
           keyExtractor={(item) => item.id}
@@ -163,6 +177,9 @@ const App = () => {
               <View style={styles.btnRow}>
                 <Pressable style={styles.btnEdit} onPress={handleEditModal}>
                   <Text style={styles.textAdd}>Editar</Text>
+                </Pressable>
+                <Pressable style={styles.btnDelete} onPress={handleDeleteModal}>
+                  <Text style={styles.textAdd}>Eliminar</Text>
                 </Pressable>
               </View>
             </>
@@ -245,6 +262,12 @@ const styles = StyleSheet.create({
   },
   btnEdit: {
     backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  btnDelete: {
+    backgroundColor: 'red',
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
