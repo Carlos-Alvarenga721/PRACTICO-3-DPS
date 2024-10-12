@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList, Pressable, Modal } from 'react-native';
 import useStore from '../components/useStore';
 import axios from 'axios';
 import React, { useEffect, useState, useCallback } from 'react';
@@ -27,6 +27,20 @@ function Recurso(props) {
   );
 }
 
+// Recurso view in modal
+function RecursoModal(props) {
+  return (
+    <>
+      <View style={styles.modalContent}>
+        <Text style={styles.titleModal}>Titulo: {props.title}</Text>
+        <Text style={styles.textModal}>Descripcion: {props.description}</Text>
+        <Text style={styles.textModal}>Tipo: {props.type}</Text>
+        <Text style={styles.textModal}>{props.id}</Text>
+      </View>
+    </>
+  );
+}
+
 const App = () => {
   const setResources = useStore((state) => state.setResources);
   const data = useStore((state) => state.resources);
@@ -49,6 +63,7 @@ const App = () => {
   useFocusEffect(
     useCallback(() => {
       dataGetter();
+      setSearchedResource(null); // Clear searched resource on mount
     }, [])
   )
 
@@ -78,6 +93,14 @@ const App = () => {
     setSearchId(''); // Clear the search ID input
   };
 
+  const handleCloseModal = () => {
+    showResourceList();
+  };
+
+  const handleEditModal = () => {
+    goToEditResource();
+  };
+
   if (data.length === 0) {
     return (
       <View style={styles.container}>
@@ -103,17 +126,6 @@ const App = () => {
         />
         <Button title="Buscar" onPress={searchResourceById} />
       </View>
-      {searchedResource ? (
-        <>
-          <Recurso
-            id={searchedResource.id}
-            title={searchedResource.titulo}
-            description={searchedResource.descripcion}
-            type={searchedResource.tipo}
-          />
-          <Button title="Mostrar lista de recursos" onPress={showResourceList} />
-        </>
-      ) : (
         <FlatList
           style={styles.list}
           data={data.slice()}
@@ -128,15 +140,41 @@ const App = () => {
           keyExtractor={(item) => item.id}
           extraData={data}
         />
-      )}
       <View style={styles.btnRow}>
         <Pressable style={styles.btnAdd} onPress={goToAddResource}>
           <Text style={styles.textAdd}>Agregar</Text>
         </Pressable>
-        <Pressable style={styles.btnAdd} onPress={goToEditResource}>
-          <Text style={styles.textAdd}>Editar</Text>
-        </Pressable>
       </View>
+      {/* Modal view to view resource information */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={searchedResource !== null}
+      >
+        <View style={styles.container}>
+          {searchedResource ? (
+            <>
+              <RecursoModal
+                title={searchedResource.titulo}
+                description={searchedResource.descripcion}
+                type={searchedResource.tipo}
+                id={searchedResource.id}
+              />
+              <View style={styles.btnRow}>
+                <Pressable style={styles.btnEdit} onPress={handleEditModal}>
+                  <Text style={styles.textAdd}>Editar</Text>
+                </Pressable>
+              </View>
+            </>
+            ):(
+              <Text style={styles.title}>No encontrado</Text>
+            )
+          }
+          <Pressable style={styles.btnClose} title="Cerrar" onPress={handleCloseModal}>
+            <Text style={styles.textAdd}>Cerrar</Text>
+          </Pressable>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -149,7 +187,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 50,
+    paddingTop: 10,
   },
   title: {
     fontSize: 24,
@@ -197,7 +235,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
-    marginTop: 20,
+    marginVertical: 20,
   },
   btnAdd: {
     backgroundColor: 'green',
@@ -205,8 +243,36 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 10,
   },
+  btnEdit: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  btnClose: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
   textAdd: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  modalContent: {
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    width: '80%',
+  },
+  titleModal: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  textModal: {
+    fontSize: 14,
   },
 });
