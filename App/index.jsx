@@ -1,36 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList, Pressable, Modal } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, SafeAreaView, FlatList, Pressable, Modal, Image, Linking } from 'react-native';
 import useStore from '../components/useStore';
 import axios from 'axios';
 import React, { useEffect, useState, useCallback } from 'react';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native'; // Importar useFocusEffect
-
-
-// Resource component
-function Recurso(props) {
-  return (
-    <View style={styles.row}>
-      <View style={styles.columnId}>
-        <Text style={styles.listTextId}>{props.index + 1}</Text>
-      </View>
-      <View style={styles.column}>
-        <Text style={styles.listText}>{props.title}</Text>
-      </View>
-      <View style={styles.column}>
-        <Text style={styles.listText}>{props.description}</Text>
-      </View>
-      <View style={styles.column}>
-        <Text style={styles.listText}>{props.type}</Text>
-      </View>
-    </View>
-  );
-}
+import { A } from '@expo/html-elements';
 
 // Recurso view in modal
 function RecursoModal(props) {
   return (
     <>
+      <View style={styles.containerImage}>
+        {
+          props.image ? null : <Text>No hay imagen</Text>
+        }
+        <Image source={{ uri: props.image }} style={styles.image} />
+      </View>
       <View style={styles.modalContent}>
         <Text style={styles.titleModal}>Titulo: {props.title}</Text>
         <Text style={styles.textModal}>Descripcion: {props.description}</Text>
@@ -46,6 +32,29 @@ const App = () => {
   const [searchId, setSearchId] = useState('');
   const [searchedResource, setSearchedResource] = useState(null);
 
+  // Resource component
+  function Recurso(props) {
+    return (
+      <Pressable onPress={() => {
+        setSearchedResource(props.item);
+      }}>
+        <View style={styles.row}>
+          <View style={styles.columnId}>
+            <Text style={styles.listTextId}>{props.index + 1}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.listText}>{props.title}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.listText}>{props.description}</Text>
+          </View>
+          <View style={styles.column}>
+            <Text style={styles.listText}>{props.type}</Text>
+          </View>
+        </View>
+      </Pressable>
+    );
+  }
 
   // Data set function
   const dataGetter = async () => {
@@ -114,6 +123,14 @@ const App = () => {
     handleCloseModal();
   };
 
+  const visitLink = (url) => {
+    Linking.openURL(url).catch((err) => console.error('Error opening URL:', err));
+  };
+
+  const handleVisitModal = (link) => {
+    visitLink(link);
+  };
+
   if (data.length === 0) {
     return (
       <View style={styles.container}>
@@ -144,6 +161,7 @@ const App = () => {
           data={data.slice()}
           renderItem={({ item, index }) => (
             <Recurso
+              item={item}
               id={item.id}
               title={item.titulo}
               description={item.descripcion}
@@ -159,6 +177,8 @@ const App = () => {
           <Text style={styles.textAdd}>Agregar</Text>
         </Pressable>
       </View>
+
+
       {/* Modal view to view resource information */}
       <Modal
         animationType="slide"
@@ -173,7 +193,13 @@ const App = () => {
                 description={searchedResource.descripcion}
                 type={searchedResource.tipo}
                 id={searchedResource.id}
+                url={searchedResource.enlace}
+                image={searchedResource.imagen}
               />
+              <Pressable style={styles.btnVisit} onPress={() => {handleVisitModal(searchedResource.enlace)}}>
+                <Text style={styles.textAdd}>Visitar</Text>
+              </Pressable>
+
               <View style={styles.btnRow}>
                 <Pressable style={styles.btnEdit} onPress={handleEditModal}>
                   <Text style={styles.textAdd}>Editar</Text>
@@ -248,6 +274,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'right',
   },
+  btnVisit: {
+    backgroundColor: 'darkgrey',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    width: '55%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
   btnRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -265,15 +301,21 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
+    width: '25%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnDelete: {
     backgroundColor: 'red',
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
+    width: '25%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnClose: {
-    backgroundColor: 'red',
+    backgroundColor: 'grey',
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
@@ -282,6 +324,18 @@ const styles = StyleSheet.create({
   textAdd: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  containerImage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '90%',
+    height: 200,
+    backgroundColor: '#ccc',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   modalContent: {
     padding: 20,
