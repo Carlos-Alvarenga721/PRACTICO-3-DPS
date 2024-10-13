@@ -92,7 +92,8 @@ const App = () => {
   };
 
   const goToEditResource = () => {
-    router.navigate('/editResource');
+    router.navigate('/editResource', { resources: data });
+    //navigate.navigate('/editResource', { resource });
   };
 
   // Function to show the list of resources
