@@ -117,6 +117,7 @@ const App = () => {
 
   const handleEditModal = () => {
     goToEditResource();
+    handleCloseModal();
   };
 
   const handleDeleteModal = () => {
