@@ -26,5 +26,5 @@ aprendizaje, como libros, videos y tutoriales relacionados con la ingeniería de
       
  6) LINK DEL VIDEO EXPLICATIVO DEL CODIGO Y FUNCIONALIDAD:
     
-      https://youtu.be/mClgEr7ovNg
+      [https://youtu.be/mClgEr7ovNg](https://youtu.be/klbM6YftfMo)
  
