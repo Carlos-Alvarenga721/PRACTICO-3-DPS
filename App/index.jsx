@@ -174,7 +174,7 @@ const App = () => {
           keyExtractor={(item) => item.id}
           extraData={data}
         />
-      <View style={styles.btnRow}>
+      <View style={styles.btnRowAdd}>
         <Pressable style={styles.btnAdd} onPress={goToAddResource}>
           <Text style={styles.textAdd}>Agregar</Text>
         </Pressable>
@@ -289,6 +289,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '60%',
+    marginVertical: 20,
+  },
+  btnRowAdd: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
     marginVertical: 20,
   },
   btnAdd: {
