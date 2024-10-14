@@ -5,7 +5,6 @@ import axios from 'axios';
 import React, { useEffect, useState, useCallback } from 'react';
 import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native'; // Importar useFocusEffect
-import { A } from '@expo/html-elements';
 
 // Recurso view in modal
 function RecursoModal(props) {
@@ -28,6 +27,7 @@ function RecursoModal(props) {
 
 const App = () => {
   const setResources = useStore((state) => state.setResources);
+  const setSearchedResourceInStore = useStore((state) => state.setSearchedResourceInStore);
   const data = useStore((state) => state.resources);
   const [searchId, setSearchId] = useState('');
   const [searchedResource, setSearchedResource] = useState(null);
@@ -92,7 +92,9 @@ const App = () => {
   };
 
   const goToEditResource = () => {
-    router.navigate('/editResource', { resources: data });
+    console.log("searchedResource", searchedResource);
+    setSearchedResourceInStore(searchedResource);
+    router.navigate('/editResource');
     //navigate.navigate('/editResource', { resource });
   };
 
