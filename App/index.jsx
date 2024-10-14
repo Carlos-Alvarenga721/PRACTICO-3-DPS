@@ -17,9 +17,9 @@ function RecursoModal(props) {
         <Image source={{ uri: props.image }} style={styles.image} />
       </View>
       <View style={styles.modalContent}>
-        <Text style={styles.titleModal}>Titulo: {props.title}</Text>
-        <Text style={styles.textModal}>Descripcion: {props.description}</Text>
-        <Text style={styles.textModal}>Tipo: {props.type}</Text>
+        <Text style={styles.titleModal}>Titulo: <Text style={styles.textModal}>{props.title}</Text></Text>
+        <Text style={styles.titleModal}>Descripcion: <Text style={styles.textModal}>{props.description}</Text></Text>
+        <Text style={styles.titleModal}>Tipo: <Text style={styles.textModal}>{props.type}</Text></Text>
       </View>
     </>
   );
@@ -150,7 +150,7 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      <Text style={styles.title}>Recursos</Text>
+      <Text style={styles.title}>Bienvenido a tus recursos</Text>
       <View style={styles.searchbox}>
         <TextInput
           placeholder="Buscar por ID"
@@ -160,6 +160,23 @@ const App = () => {
         />
         <Button title="Buscar" onPress={searchResourceById} />
       </View>
+
+      {/*ENCABEZADO DE LA APLICACION*/}
+      <View style={styles.headerRow}> 
+        <View style={styles.columnIdT}>
+          <Text style={styles.listTextHeader}>ID</Text>
+        </View>
+        <View style={styles.columnT}>
+          <Text style={styles.listTextHeader}>Título</Text>
+        </View>
+        <View style={styles.columnT}>
+          <Text style={styles.listTextHeader}>Descripción</Text>
+        </View>
+        <View style={styles.columnT}>
+          <Text style={styles.listTextHeader}>Tipo</Text>
+        </View>
+      </View>
+  
         <FlatList
           style={styles.list}
           data={data.slice()}
@@ -214,11 +231,15 @@ const App = () => {
               </View>
             </>
             ):(
-              <Text style={styles.title}>No encontrado</Text>
+              <>
+              <Image source={{ uri: 'https://i.pinimg.com/564x/a1/91/86/a19186d8f829d16b391f9fc12e4aa4e5.jpg' }} style={styles.image404} />
+              <Text style={styles.notfound}>
+                Recurso no encontrado 😞 Seleccione un ID existente 🔍</Text>
+              </>
             )
           }
           <Pressable style={styles.btnClose} title="Cerrar" onPress={handleCloseModal}>
-            <Text style={styles.textAdd}>Cerrar</Text>
+            <Text style={styles.textAdd}>Regresar al Menu</Text>
           </Pressable>
         </View>
       </Modal>
@@ -240,6 +261,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  notfound: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingLeft: 50,
+    paddingRight: 50,
+  },
+  image404: {
+    width: 400,
+    height: 400,
+    resizeMode: 'contain',
+  },
   searchbox: {
     flexDirection: 'row',
     margin: 20,
@@ -249,6 +281,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 5,
+    marginRight: 10,
   },
   list: {
     flex: 1,
@@ -260,6 +293,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     flexDirection: 'row',
     justifyContent: 'space-around',
+    
   },
   column: {
     width: '25%',
@@ -270,16 +304,18 @@ const styles = StyleSheet.create({
     width: '5%',
     marginLeft: 10,
     marginRight: 10,
+    alignItems: 'center',
   },
   listText: {
     fontSize: 12,
+    textAlign: 'center',
   },
   listTextId: {
     fontSize: 12,
     textAlign: 'right',
   },
   btnVisit: {
-    backgroundColor: 'darkgrey',
+    backgroundColor: '#0d5a22',
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
@@ -326,7 +362,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
-    marginTop: 30,
+    marginTop: 5,
   },
   textAdd: {
     color: 'white',
@@ -354,8 +390,33 @@ const styles = StyleSheet.create({
   titleModal: {
     fontSize: 18,
     fontWeight: 'bold',
+    paddingBottom: 10,
   },
   textModal: {
     fontSize: 14,
   },
+  headerRow: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    backgroundColor: '#f8f8f8', // Color de fondo para distinguir los encabezados
+    width: '100%', // Asegurarse que ocupe todo el ancho del contenedor
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc', // Línea separadora
+  },
+  listTextHeader: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  }, 
+  columnIdT: {
+    flex: 0.5, // Ajuste el espacio que ocupa la columna ID
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  columnT: {
+    flex: 2, // Ajuste igual para todas las demás columnas
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    textAlign: 'center',
+  }, 
 });
