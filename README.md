@@ -27,12 +27,4 @@ aprendizaje, como libros, videos y tutoriales relacionados con la ingeniería de
  6) LINK DEL VIDEO EXPLICATIVO DEL CODIGO Y FUNCIONALIDAD:
     
       https://youtu.be/mClgEr7ovNg
-
-6) SNACK DEL PROYECTO:
-    
-     https://snack.expo.dev/@cruzm-224/desafiodps02
-
-     Usuario: usuarioDPS
-   
-     Contraseña: 123
  
